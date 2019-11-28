@@ -41,7 +41,7 @@
               <el-button type="primary" size="mini" icon="el-icon-edit" @click="showModifyDialog(scope.row.id)"></el-button>
               <el-button type="primary" size="mini" icon="el-icon-delete" @click="deleteUser(scope.row.id)"></el-button>
               <el-tooltip class="item" effect="dark" content="角色权限配置" placement="top" :enterable="false">
-                <el-button type="primary" size="mini" icon="el-icon-setting">
+                <el-button type="primary" size="mini" icon="el-icon-setting" @click="showRightsDialog(scope.row)">
                 </el-button>
               </el-tooltip>
             </template>
@@ -99,6 +99,29 @@
         <span slot="footer" class="dialog-footer">
           <el-button @click="modifyDialogVisible = false">取 消</el-button>
           <el-button type="primary" @click="modifyUserData">确 定</el-button>
+        </span>
+      </el-dialog>
+      <el-dialog
+        @close="clearSelectRole"
+        title="角色权限分配"
+        :visible.sync="rightsDialogVisible"
+        width="40%">
+        <p>当前用户： {{userInfo.username}}</p>
+        <p>当前角色： {{userInfo.role_name}}</p>
+        <p>
+          分配新的角色
+          <el-select v-model="selectRoleId" placeholder="分配角色">
+            <el-option
+              v-for="item in rolesList"
+              :key="item.id"
+              :label="item.roleName"
+              :value="item.id">
+            </el-option>
+          </el-select>
+        </p>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="rightsDialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click="saveRoleInfo">确 定</el-button>
         </span>
       </el-dialog>
     </div>
@@ -163,7 +186,15 @@ export default {
         ]
       },
       dialogVisible: false,
-      modifyDialogVisible: false
+      modifyDialogVisible: false,
+      rightsDialogVisible: false,
+      userInfo: {
+        id: '',
+        username: '',
+        role_name: ''
+      },
+      selectRoleId: '',
+      rolesList: []
     }
   },
   created () {
@@ -172,7 +203,6 @@ export default {
   methods: {
     async getUserList () {
       const { data: res } = await this.$http.get('users', { 'params': this.queryInfo })
-      console.log(res)
       if (res.meta.status !== 200) return this.$message.error('获取用户列表失败')
       this.userList = res.data.users
       this.total = res.data.total
@@ -220,7 +250,6 @@ export default {
     async showModifyDialog (id) {
       console.log(id)
       const { data: res } = await this.$http.get(`users/${id}`)
-      console.log(res)
       if (res.meta.status !== 200) {
         return this.$message.error('查询用户信息失败')
       }
@@ -254,6 +283,31 @@ export default {
         this.$message.success(res.meta.msg)
         this.getUserList()
       }
+    },
+    async showRightsDialog (rights) {
+      this.rightsDialogVisible = true
+      this.userInfo.username = rights.username
+      this.userInfo.role_name = rights.role_name
+      this.userInfo.id = rights.id
+      const { data: res } = await this.$http.get('roles')
+      if (res.meta.status !== 200) {
+        return this.$message.error('获取角色列表失败')
+      }
+      this.rolesList = res.data
+      this.modifyForm = res.data
+    },
+    async saveRoleInfo () {
+      if (!this.selectRoleId) {
+        return this.$message.info('请选择要分配的角色')
+      }
+      const { data: res } = await this.$http.put(`users/${this.userInfo.id}/role`, { 'rid': this.selectRoleId })
+      if (res.meta.status !== 200) return this.$message.error('更新角色失败') //eslint-disable-line
+      this.$message.success(res.meta.msg)
+      this.getUserList()
+      this.rightsDialogVisible = false
+    },
+    clearSelectRole () {
+      this.selectRoleId = ''
     }
   }
 }
