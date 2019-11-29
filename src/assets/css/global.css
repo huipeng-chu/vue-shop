@@ -16,3 +16,9 @@ html, body, #app {
 .el-pagination {
     margin-top: 20px;
 }
+.el-alert {
+    margin-bottom: 20px;
+}
+.el-tabs {
+    margin-top: 20px;
+}
