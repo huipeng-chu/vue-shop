@@ -37,7 +37,6 @@
           </el-table-column>
           <el-table-column label="操作" width="180px">
             <template slot-scope="scope">
-              <div v-show="false">{{scope.row}}</div>
               <el-button type="primary" size="mini" icon="el-icon-edit" @click="showModifyDialog(scope.row.id)"></el-button>
               <el-button type="primary" size="mini" icon="el-icon-delete" @click="deleteUser(scope.row.id)"></el-button>
               <el-tooltip class="item" effect="dark" content="角色权限配置" placement="top" :enterable="false">
