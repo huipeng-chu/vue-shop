@@ -22,3 +22,12 @@ html, body, #app {
 .el-tabs {
     margin-top: 20px;
 }
+.el-steps {
+    margin: 15px 0;
+}
+.el-step__title {
+    font-size: 12px;
+}
+.ql-editor {
+    min-height: 200px;
+}
