@@ -203,7 +203,7 @@ export default {
     async getUserList () {
       const { data: res } = await this.$http.get('users', { 'params': this.queryInfo })
       if (res.meta.status !== 200) return this.$message.error('获取用户列表失败')
-      this.$message.success(res.mate.msg)
+      this.$message.success(res.meta.msg)
       this.userList = res.data.users
       this.total = res.data.total
     },
@@ -301,13 +301,14 @@ export default {
         return this.$message.info('请选择要分配的角色')
       }
       const { data: res } = await this.$http.put(`users/${this.userInfo.id}/role`, { 'rid': this.selectRoleId })
-      if (res.meta.status !== 200) return this.$message.error('更新角色失败') //eslint-disable-line
+      if (res.meta.status !== 200) return this.$message.error('更新角色失败')
       this.$message.success(res.meta.msg)
       this.getUserList()
       this.rightsDialogVisible = false
     },
     clearSelectRole () {
       this.selectRoleId = ''
+      this.userInfo = {}
     }
   }
 }
